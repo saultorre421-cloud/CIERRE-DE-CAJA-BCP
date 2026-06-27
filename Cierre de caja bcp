@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cierre BCP - Diseño Nativo</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background-color: #e2e8f0; color: #0f172a; padding-bottom: 40px; }
+        
+        /* CAJA PRINCIPAL DE CUADRE */
+        .caja-principal { background: white; margin: 15px; padding: 20px; border: 3px solid #0043ce; border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .fila-destacada { display: flex; justify-content: space-between; align-items: center; }
+        .fila-destacada.borde-inferior { border-bottom: 3px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; }
+        .fila-destacada.borde-inferior-fino { border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 12px; }
+        
+        .etiqueta-destacada { font-size: 16px; font-weight: 900; color: #334155; }
+        .valor-destacado { font-size: 24px; font-weight: 900; color: #000; }
+        
+        /* Efectivo Físico Resaltado */
+        .etiqueta-principal { font-size: 20px; font-weight: 900; color: #0043ce; }
+        .fisico-gigante { font-size: 48px; font-weight: 900; color: #0043ce; letter-spacing: -1px; line-height: 1; }
+        
+        .input-sistema-grande { width: 130px; font-size: 24px; font-weight: 900; text-align: right; border: none; background: #f8fafc; color: #0f172a; border-radius: 8px; padding: 5px 10px; outline: none; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .input-sistema-grande:focus { background: #e2e8f0; border-bottom: 3px solid #ff6a00; }
+        .input-sistema-grande::placeholder { color: #cbd5e1; opacity: 0.7; }
+        
+        /* Datos Secundarios (Suma Físico + Sistema) */
+        .etiqueta-secundaria { font-size: 14px; font-weight: 700; color: #64748b; }
+        .valor-secundario { font-size: 20px; font-weight: 900; color: #475569; }
+
+        /* BASE DE OPERACIONES */
+        .referencia-base { margin: -5px 20px 15px 20px; text-align: right; display: flex; justify-content: flex-end; align-items: center; }
+        .etiqueta-base { font-size: 13px; color: #64748b; font-weight: 700; }
+        .input-base-pequeno { width: 90px; font-size: 13px; font-weight: 700; color: #64748b; text-align: right; border: none; background: transparent; outline: none; border-bottom: 1px dashed #cbd5e1; margin-left: 5px; }
+
+        /* SEMÁFORO DINÁMICO (TAMAÑO REDUCIDO) */
+        .semaforo { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 10px; border-radius: 8px; margin: 0 15px 20px 15px; border: 1px solid transparent; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
+        
+        .estado-verde { background-color: #dcfce7; border-color: #86efac; color: #14532d; }
+        .estado-rojo { background-color: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
+        .estado-naranja { background-color: #ffedd5; border-color: #fdba74; color: #7c2d12; }
+        
+        #mensaje-estado { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        #valor-diferencia { font-size: 16px; font-weight: 900; }
+
+        /* ACORDEONES Y PANELES */
+        .seccion-conteo { margin: 0 15px 20px 15px; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.08); overflow: hidden; }
+        .accordion { background-color: white; color: #0f172a; cursor: pointer; padding: 20px; width: 100%; border: none; border-bottom: 2px solid #e2e8f0; text-align: left; outline: none; font-size: 18px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
+        .accordion:active { background-color: #f1f5f9; }
+        .accordion:after { content: '\25BC'; font-size: 14px; color: #64748b; }
+        .accordion.active:after { content: '\25B2'; color: #0043ce; }
+        
+        .panel { padding: 0 15px; background-color: #f8fafc; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 2px solid #e2e8f0; }
+        .row:last-child { border-bottom: none; }
+        
+        /* DISEÑO DE BILLETES Y MONEDAS POR CSS (Colores Peruanos) */
+        .label-container { display: flex; align-items: center; width: 42%; }
+        
+        /* Billetes */
+        .billete { width: 50px; height: 32px; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: 900; color: white; margin-right: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .b200 { background: linear-gradient(135deg, #f43f5e, #fb923c); } 
+        .b100 { background: linear-gradient(135deg, #3b82f6, #1e3a8a); } 
+        .b50  { background: linear-gradient(135deg, #ef4444, #991b1b); } 
+        .b20  { background: linear-gradient(135deg, #b45309, #713f12); } 
+        .b10  { background: linear-gradient(135deg, #10b981, #065f46); } 
+        .b1000 { background: linear-gradient(135deg, #64748b, #334155); } 
+
+        /* Monedas */
+        .moneda { border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #1e293b; margin-right: 12px; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.2); border: 2px solid transparent; }
+        .m-bimetalica { background: radial-gradient(circle, #f1f5f9 40%, #fbbf24 45%); border-color: #d97706; }
+        .m-plata { background: linear-gradient(135deg, #f1f5f9, #cbd5e1); border-color: #94a3b8; }
+        .m-bronce { background: linear-gradient(135deg, #fcd34d, #f59e0b); border-color: #b45309; color: #713f12; }
+        
+        .sz-5 { width: 36px; height: 36px; font-size: 16px; }
+        .sz-2 { width: 32px; height: 32px; font-size: 14px; }
+        .sz-1 { width: 30px; height: 30px; font-size: 14px; }
+        .sz-05 { width: 28px; height: 28px; font-size: 12px; }
+        .sz-02 { width: 26px; height: 26px; font-size: 11px; }
+        .sz-01 { width: 24px; height: 24px; font-size: 10px; }
+
+        .label-text { font-size: 18px; font-weight: 900; color: #1e293b; }
+
+        /* BOTONES + / - */
+        .controls { display: flex; align-items: center; background: white; border-radius: 10px; width: 55%; justify-content: space-between; padding: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); border: 2px solid #cbd5e1; }
+        .btn-control { background: #e2e8f0; border: 2px solid #94a3b8; font-size: 32px; font-weight: 900; color: #0f172a; width: 50px; height: 50px; cursor: pointer; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-control:active { background: #cbd5e1; transform: scale(0.95); }
+        .input-qty { width: 100%; text-align: center; font-size: 26px; font-weight: 900; border: none; background: transparent; color: #000; outline: none; }
+        .input-qty::placeholder { color: #cbd5e1; opacity: 0.6; }
+
+        /* BOTÓN DE BORRAR */
+        .btn-reset { background-color: transparent; color: #ef4444; border: 2px dashed #ef4444; width: calc(100% - 30px); margin: 0 15px; padding: 15px; font-size: 16px; font-weight: 900; border-radius: 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-reset:active { background-color: #fee2e2; }
+
+    </style>
+</head>
+<body>
+
+    <div class="caja-principal">
+        <div class="fila-destacada borde-inferior">
+            <span class="etiqueta-principal">TOTAL FÍSICO</span>
+            <span class="fisico-gigante" id="display-efectivo">S/ 0.00</span>
+        </div>
+        <div class="fila-destacada borde-inferior-fino">
+            <span class="etiqueta-destacada">SALDO SISTEMA</span>
+            <input type="number" id="input-sistema" class="input-sistema-grande" value="" placeholder="0.00" oninput="calcularCuadre()">
+        </div>
+        <div class="fila-destacada">
+            <span class="etiqueta-secundaria">FÍSICO + SISTEMA</span>
+            <span class="valor-secundario" id="display-suma">S/ 0.00</span>
+        </div>
+    </div>
+
+    <div class="referencia-base">
+        <span class="etiqueta-base">Capital Base S/ </span>
+        <input type="number" id="input-base" class="input-base-pequeno" value="22889.02" oninput="calcularCuadre()">
+    </div>
+
+    <div id="caja-diferencia" class="semaforo estado-verde">
+        <span id="mensaje-estado">✅ EXACTO:</span>
+        <span id="valor-diferencia">S/ 0.00</span>
+    </div>
+
+    <div class="seccion-conteo">
+        
+        <button class="accordion">Fajos de S/ 1000</button>
+        <div class="panel">
+            <div class="row">
+                <div class="label-container"><div class="billete b1000">1000</div><div class="label-text">Fajos</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('f1000', -1)">-</button><input type="number" id="f1000" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('f1000', 1)">+</button></div>
+            </div>
+        </div>
+
+        <button class="accordion active">Billetes Sueltos</button>
+        <div class="panel" style="max-height: 800px;">
+            <div class="row">
+                <div class="label-container"><div class="billete b200">200</div><div class="label-text">S/ 200</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('b200', -1)">-</button><input type="number" id="b200" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b200', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="billete b100">100</div><div class="label-text">S/ 100</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('b100', -1)">-</button><input type="number" id="b100" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b100', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="billete b50">50</div><div class="label-text">S/ 50</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('b50', -1)">-</button><input type="number" id="b50" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b50', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="billete b20">20</div><div class="label-text">S/ 20</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('b20', -1)">-</button><input type="number" id="b20" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b20', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="billete b10">10</div><div class="label-text">S/ 10</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('b10', -1)">-</button><input type="number" id="b10" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b10', 1)">+</button></div>
+            </div>
+        </div>
+
+        <button class="accordion">Monedas (Sencillo)</button>
+        <div class="panel">
+            <div class="row">
+                <div class="label-container"><div class="moneda m-bimetalica sz-5">5</div><div class="label-text">S/ 5.00</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m5', -1)">-</button><input type="number" id="m5" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m5', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="moneda m-bimetalica sz-2">2</div><div class="label-text">S/ 2.00</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m2', -1)">-</button><input type="number" id="m2" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m2', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="moneda m-plata sz-1">1</div><div class="label-text">S/ 1.00</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m1', -1)">-</button><input type="number" id="m1" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m1', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="moneda m-plata sz-05">.50</div><div class="label-text">S/ 0.50</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m050', -1)">-</button><input type="number" id="m050" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m050', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="moneda m-bronce sz-02">.20</div><div class="label-text">S/ 0.20</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m020', -1)">-</button><input type="number" id="m020" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m020', 1)">+</button></div>
+            </div>
+            <div class="row">
+                <div class="label-container"><div class="moneda m-bronce sz-01">.10</div><div class="label-text">S/ 0.10</div></div>
+                <div class="controls"><button class="btn-control" onclick="modificar('m010', -1)">-</button><input type="number" id="m010" class="input-qty" value="" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m010', 1)">+</button></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-reset" onclick="borrarDatos()">🗑️ Limpiar para nuevo día</button>
+
+    <script>
+        // Animación de Acordeones
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+
+        function modificar(id, cantidad) {
+            let input = document.getElementById(id);
+            let valorActual = parseInt(input.value) || 0;
+            let nuevoValor = valorActual + cantidad;
+            
+            if (nuevoValor > 0) {
+                input.value = nuevoValor;
+            } else {
+                input.value = ""; // Vuelve a quedar en blanco si llega a cero
+            }
+            calcularCuadre();
+        }
+
+        // Función de Borrado
+        function borrarDatos() {
+            const inputs = ['f1000', 'b200', 'b100', 'b50', 'b20', 'b10', 'm5', 'm2', 'm1', 'm050', 'm020', 'm010'];
+            for (let i = 0; i < inputs.length; i++) {
+                document.getElementById(inputs[i]).value = "";
+            }
+            document.getElementById('input-sistema').value = "";
+            calcularCuadre();
+        }
+
+        function calcularCuadre() {
+            let getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+            
+            let totalEfectivo = (getVal('f1000') * 1000) + (getVal('b200') * 200) + (getVal('b100') * 100) + (getVal('b50') * 50) + (getVal('b20') * 20) + (getVal('b10') * 10) + (getVal('m5') * 5.0) + (getVal('m2') * 2.0) + (getVal('m1') * 1.0) + (getVal('m050') * 0.5) + (getVal('m020') * 0.2) + (getVal('m010') * 0.1);
+            
+            let saldoSistema = parseFloat(document.getElementById('input-sistema').value) || 0;
+            let capitalBase = parseFloat(document.getElementById('input-base').value) || 0;
+            
+            let sumaTotal = totalEfectivo + saldoSistema;
+            let diferencia = sumaTotal - capitalBase;
+
+            document.getElementById('display-efectivo').innerText = "S/ " + totalEfectivo.toFixed(2);
+            document.getElementById('display-suma').innerText = "S/ " + sumaTotal.toFixed(2);
+            
+            let cajaDif = document.getElementById('caja-diferencia');
+            let msjEstado = document.getElementById('mensaje-estado');
+            let valorDif = document.getElementById('valor-diferencia');
+            
+            cajaDif.className = 'semaforo'; 
+            
+            if (Math.abs(diferencia) <= 0.05) {
+                cajaDif.classList.add('estado-verde');
+                msjEstado.innerText = "✅ EXACTO:";
+                valorDif.innerText = "S/ 0.00";
+            } else if (diferencia < 0) {
+                cajaDif.classList.add('estado-rojo');
+                msjEstado.innerText = "⚠️ FALTAN:";
+                valorDif.innerText = "- S/ " + Math.abs(diferencia).toFixed(2);
+            } else {
+                cajaDif.classList.add('estado-naranja');
+                msjEstado.innerText = "⚠️ SOBRAN:";
+                valorDif.innerText = "+ S/ " + diferencia.toFixed(2);
+            }
+        }
+
+        window.onload = calcularCuadre;
+    </script>
+</body>
+</html>
