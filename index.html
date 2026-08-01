@@ -144,31 +144,7 @@
             outline: none;
         }
 
-        /* PESTAÑA TOTAL (Basado en el dibujo manual) */
-        .top-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 800;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-limpiar { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
-        .btn-guardar { background-color: var(--bcp-blue); color: white; }
-
+        /* PESTAÑA TOTAL */
         .summary-box {
             background: white;
             border: 2px solid var(--bcp-blue);
@@ -242,6 +218,26 @@
         .coin-gold { background: radial-gradient(circle, #fde047, #ca8a04); }
         .coin-silver { background: radial-gradient(circle, #f1f5f9, #94a3b8); }
 
+        /* BOTÓN BORRAR INFERIOR (Discreto y Profesional) */
+        .btn-borrar {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 20px; /* Diseño en forma de píldora */
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            color: #ef4444; /* Color rojo sutil para indicar borrado */
+            transition: 0.2s ease;
+        }
+        .btn-borrar:active {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            transform: scale(0.95);
+        }
+
     </style>
 </head>
 <body>
@@ -256,11 +252,6 @@
     <!-- PESTAÑA: TOTAL -->
     <div id="Total" class="tab-content active">
         
-        <div class="top-buttons">
-            <button class="btn-action btn-limpiar" onclick="borrarDatos()">▽ Limpiar</button>
-            <button class="btn-action btn-guardar" onclick="guardarDatos()">💾 Guardar</button>
-        </div>
-
         <div class="summary-box">
             <div class="summary-row">
                 <span class="summary-label">EFECTIVO</span>
@@ -299,6 +290,9 @@
                 <button class="btn-control" onclick="modificar('f1000', 1, 1000)">+</button>
             </div>
         </div>
+
+        <!-- Botón Borrar (Total) -->
+        <button class="btn-borrar" onclick="borrarDatos('total')">Borrar</button>
     </div>
 
     <!-- PESTAÑA: BILLETES -->
@@ -323,6 +317,9 @@
             <div class="card-info"><span class="den-title">S/ 10</span><span class="den-sub" id="sub-b10">S/ 0.00</span></div>
             <div class="controls"><button class="btn-control" onclick="modificar('b10', -1, 10)">-</button><input type="number" id="b10" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b10', 1, 10)">+</button></div>
         </div>
+
+        <!-- Botón Borrar (Billetes) -->
+        <button class="btn-borrar" onclick="borrarDatos('billetes')">Borrar</button>
     </div>
 
     <!-- PESTAÑA: MONEDAS -->
@@ -351,6 +348,9 @@
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-silver"></span>S/ 0.10</span><span class="den-sub" id="sub-m010">S/ 0.00</span></div>
             <div class="controls"><button class="btn-control" onclick="modificar('m010', -1, 0.1)">-</button><input type="number" id="m010" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m010', 1, 0.1)">+</button></div>
         </div>
+
+        <!-- Botón Borrar (Monedas) -->
+        <button class="btn-borrar" onclick="borrarDatos('monedas')">Borrar</button>
     </div>
 
     <script>
@@ -383,53 +383,27 @@
             calcularCuadre();
         }
 
-        // Función de Borrado general
-        function borrarDatos() {
-            if(confirm("¿Estás seguro de limpiar todos los datos?")) {
-                const inputs = ['f1000', 'b200', 'b100', 'b50', 'b20', 'b10', 'm5', 'm2', 'm1', 'm050', 'm020', 'm010', 'input-sistema'];
-                for (let i = 0; i < inputs.length; i++) {
-                    document.getElementById(inputs[i]).value = "";
-                }
-                calcularCuadre();
+        // FUNCIÓN DE BORRADO DINÁMICO E INMEDIATO (Sin confirmación)
+        function borrarDatos(tipo) {
+            let inputsALimpiar = [];
+
+            if (tipo === 'total') {
+                inputsALimpiar = ['f1000', 'b200', 'b100', 'b50', 'b20', 'b10', 'm5', 'm2', 'm1', 'm050', 'm020', 'm010', 'input-sistema'];
+            } 
+            else if (tipo === 'billetes') {
+                inputsALimpiar = ['b200', 'b100', 'b50', 'b20', 'b10'];
+            } 
+            else if (tipo === 'monedas') {
+                inputsALimpiar = ['m5', 'm2', 'm1', 'm050', 'm020', 'm010'];
             }
-        }
 
-        // FUNCIÓN DE GUARDADO HACIA GOOGLE SHEETS
-        function guardarDatos() {
-            // 1. Capturar el total que muestra la pantalla
-            let totalFisicoTexto = document.getElementById('display-efectivo').innerText;
+            // Vaciar los inputs seleccionados automáticamente
+            for (let i = 0; i < inputsALimpiar.length; i++) {
+                document.getElementById(inputsALimpiar[i]).value = "";
+            }
             
-            // 2. Limpiar las letras y comas para enviar solo el número puro a Sheets (ej. 24116.50)
-            let totalFisicoNum = parseFloat(totalFisicoTexto.replace('S/ ', '').replace(/,/g, ''));
-
-            // 3. LA URL DE TU GOOGLE APPS SCRIPT (YA INTEGRADA)
-            let webAppUrl = "https://script.google.com/macros/s/AKfycbzT5Wh1bUkPTt5Dx6T2rJ8zPANXdcR-ZDaWqwMiEB7BI7OZG3IlEtO9_A0lXBZrE5KMsA/exec";
-
-            // Efecto visual en el botón
-            let btnGuardar = document.querySelector('.btn-guardar');
-            let textoOriginal = btnGuardar.innerText;
-            btnGuardar.innerText = "⏳ Enviando a Sheets...";
-            btnGuardar.style.opacity = "0.7";
-
-            // 4. Enviar el dato
-            fetch(webAppUrl, {
-                method: 'POST',
-                body: JSON.stringify({ totalEfectivo: totalFisicoNum }),
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("✅ PRE-CIERRE REGISTRADO\nS/ " + totalFisicoNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " guardados en tu Google Sheet.");
-                btnGuardar.innerText = textoOriginal;
-                btnGuardar.style.opacity = "1";
-            })
-            .catch(error => {
-                alert("❌ Error de conexión. Revisa tu internet o verifica que el App Script esté correctamente publicado.");
-                btnGuardar.innerText = textoOriginal;
-                btnGuardar.style.opacity = "1";
-            });
+            // Recalcular para que todo vuelva a cero en la vista
+            calcularCuadre();
         }
 
         // Función para dar formato de moneda con separador de miles
