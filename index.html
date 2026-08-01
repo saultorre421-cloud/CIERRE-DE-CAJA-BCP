@@ -253,7 +253,7 @@
         <button class="tab-btn" onclick="openTab(event, 'Monedas')">🪙 Monedas</button>
     </div>
 
-    <!-- PESTAÑA: TOTAL (Basada en dibujo manual) -->
+    <!-- PESTAÑA: TOTAL -->
     <div id="Total" class="tab-content active">
         
         <div class="top-buttons">
@@ -394,10 +394,42 @@
             }
         }
 
-        // Placeholder para futura conexión
+        // FUNCIÓN DE GUARDADO HACIA GOOGLE SHEETS
         function guardarDatos() {
-            let totalFisico = document.getElementById('display-efectivo').innerText;
-            alert("Preparado para conexión Sheets.\nTotal actual a guardar: " + totalFisico);
+            // 1. Capturar el total que muestra la pantalla
+            let totalFisicoTexto = document.getElementById('display-efectivo').innerText;
+            
+            // 2. Limpiar las letras y comas para enviar solo el número puro a Sheets (ej. 24116.50)
+            let totalFisicoNum = parseFloat(totalFisicoTexto.replace('S/ ', '').replace(/,/g, ''));
+
+            // 3. LA URL DE TU GOOGLE APPS SCRIPT (YA INTEGRADA)
+            let webAppUrl = "https://script.google.com/macros/s/AKfycbzT5Wh1bUkPTt5Dx6T2rJ8zPANXdcR-ZDaWqwMiEB7BI7OZG3IlEtO9_A0lXBZrE5KMsA/exec";
+
+            // Efecto visual en el botón
+            let btnGuardar = document.querySelector('.btn-guardar');
+            let textoOriginal = btnGuardar.innerText;
+            btnGuardar.innerText = "⏳ Enviando a Sheets...";
+            btnGuardar.style.opacity = "0.7";
+
+            // 4. Enviar el dato
+            fetch(webAppUrl, {
+                method: 'POST',
+                body: JSON.stringify({ totalEfectivo: totalFisicoNum }),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("✅ PRE-CIERRE REGISTRADO\nS/ " + totalFisicoNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " guardados en tu Google Sheet.");
+                btnGuardar.innerText = textoOriginal;
+                btnGuardar.style.opacity = "1";
+            })
+            .catch(error => {
+                alert("❌ Error de conexión. Revisa tu internet o verifica que el App Script esté correctamente publicado.");
+                btnGuardar.innerText = textoOriginal;
+                btnGuardar.style.opacity = "1";
+            });
         }
 
         // Función para dar formato de moneda con separador de miles
