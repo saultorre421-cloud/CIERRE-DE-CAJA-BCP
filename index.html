@@ -14,14 +14,16 @@
             --text-muted: #64748b;
             --card-bg: #ffffff;
             --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --danger-bg: #fef2f2;
         }
 
         body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             margin: 0; 
             background-color: var(--bg-color); 
             color: var(--text-main); 
-            padding-bottom: 20px; 
+            padding-bottom: 25px; 
         }
 
         /* NAVEGACIÓN DE PESTAÑAS */
@@ -45,7 +47,7 @@
             border: none;
             border-bottom: 3px solid transparent;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.25s ease;
         }
 
         .tab-btn.active {
@@ -57,7 +59,7 @@
         .tab-content {
             display: none;
             padding: 15px;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
         }
 
         .tab-content.active {
@@ -65,31 +67,37 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* DISEÑO DE TARJETAS (Billetes y Monedas) */
+        /* TARJETAS (Billetes y Monedas) */
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
+            padding: 14px 16px;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .card.card-negativa {
+            border-color: #fca5a5;
+            background-color: var(--danger-bg);
         }
 
         .card-info {
             display: flex;
             flex-direction: column;
-            width: 40%;
+            width: 42%;
         }
 
         .den-title {
-            font-size: 22px;
+            font-size: 21px;
             font-weight: 900;
             color: var(--bcp-blue);
             display: flex;
@@ -99,9 +107,14 @@
 
         .den-sub {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .den-sub.sub-negativo {
+            color: var(--danger-color) !important;
         }
 
         /* CONTROLES + / - */
@@ -112,14 +125,14 @@
             border-radius: 8px;
             padding: 4px;
             border: 1px solid #cbd5e1;
-            width: 55%;
+            width: 54%;
             justify-content: space-between;
         }
 
         .btn-control {
             background: white;
             border: 1px solid #cbd5e1;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text-main);
             width: 40px;
@@ -129,10 +142,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            user-select: none;
         }
 
-        .btn-control:active { background: #e2e8f0; transform: scale(0.95); }
+        .btn-control:active { background: #e2e8f0; transform: scale(0.96); }
 
         .input-qty {
             width: 100%;
@@ -141,8 +155,13 @@
             font-weight: 800;
             border: none;
             background: transparent;
-            color: #000;
+            color: #0f172a;
             outline: none;
+            transition: color 0.2s ease;
+        }
+
+        .input-qty.val-negativo {
+            color: var(--danger-color) !important;
         }
 
         /* PESTAÑA TOTAL */
@@ -150,31 +169,31 @@
             background: white;
             border: 2px solid var(--bcp-blue);
             border-radius: 12px;
-            padding: 20px;
+            padding: 18px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
-        .summary-row:last-child { margin-bottom: 0; border-top: 2px dashed #e2e8f0; padding-top: 15px; }
+        .summary-row:last-child { margin-bottom: 0; border-top: 2px dashed #e2e8f0; padding-top: 14px; }
 
-        .summary-label { font-size: 18px; font-weight: 800; color: var(--text-main); }
-        .summary-value { font-size: 22px; font-weight: 900; color: #000; }
+        .summary-label { font-size: 17px; font-weight: 800; color: var(--text-main); }
+        .summary-value { font-size: 21px; font-weight: 900; color: #000; }
         
         .input-sistema {
-            width: 120px;
+            width: 125px;
             font-size: 20px;
             font-weight: 900;
             text-align: right;
             border: 1px solid #cbd5e1;
             background: #f8fafc;
             border-radius: 6px;
-            padding: 8px;
+            padding: 7px;
             outline: none;
         }
         .input-sistema:focus { border-color: var(--bcp-orange); }
@@ -185,11 +204,11 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 15px;
-            padding: 0 5px;
+            padding: 0 4px;
         }
-        .capital-label { font-weight: 700; color: var(--text-muted); }
+        .capital-label { font-weight: 700; color: var(--text-muted); font-size: 14px; }
         .input-base {
-            width: 100px;
+            width: 110px;
             text-align: right;
             font-weight: 700;
             border: none;
@@ -202,14 +221,14 @@
         /* SEMÁFORO */
         .semaforo {
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; border-radius: 8px; margin-bottom: 25px;
-            border: 1px solid transparent; font-weight: 900; font-size: 16px;
+            padding: 14px 16px; border-radius: 8px; margin-bottom: 20px;
+            font-weight: 900; font-size: 16px;
         }
-        .estado-verde { background-color: #dcfce7; border-color: #86efac; color: #14532d; }
-        .estado-rojo { background-color: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
-        .estado-naranja { background-color: #ffedd5; border-color: #fdba74; color: #7c2d12; }
+        .estado-verde { background-color: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+        .estado-rojo { background-color: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
+        .estado-naranja { background-color: #ffedd5; border: 1px solid #fdba74; color: #7c2d12; }
 
-        /* ICONOS MONEDAS CSS */
+        /* ICONOS MONEDAS */
         .coin-icon {
             display: inline-block;
             width: 14px; height: 14px;
@@ -243,7 +262,7 @@
             display: block;
             margin: 15px auto 0;
             padding: 8px 24px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             border-radius: 20px;
             cursor: pointer;
@@ -296,92 +315,87 @@
             <span id="valor-diferencia">S/ 0.00</span>
         </div>
 
-        <!-- Fajos integrados en la pantalla total -->
-        <h3 style="color: var(--bcp-blue); font-size: 16px; margin-bottom: 10px;">Fajos Especiales</h3>
-        <div class="card">
+        <h3 style="color: var(--bcp-blue); font-size: 15px; margin: 0 0 10px 4px;">Fajos Especiales</h3>
+        <div class="card" id="card-f1000">
             <div class="card-info">
                 <span class="den-title">📦 1000</span>
                 <span class="den-sub" id="sub-f1000">S/ 0.00</span>
             </div>
             <div class="controls">
-                <button class="btn-control" onclick="modificar('f1000', -1, 1000)">-</button>
+                <button class="btn-control" onclick="modificar('f1000', -1)">-</button>
                 <input type="number" id="f1000" class="input-qty" placeholder="0" oninput="calcularCuadre()">
-                <button class="btn-control" onclick="modificar('f1000', 1, 1000)">+</button>
+                <button class="btn-control" onclick="modificar('f1000', 1)">+</button>
             </div>
         </div>
 
-        <!-- BOTÓN DE CONEXIÓN CON GOOGLE SHEETS -->
+        <!-- Sincronización a Sheets -->
         <button class="btn-sync" id="btn-sync" onclick="sincronizarConSheets()">
             📤 Sincronizar con Hoja de Cálculo
         </button>
 
-        <!-- Botón Borrar (Total) -->
-        <button class="btn-borrar" onclick="borrarDatos('total')">Borrar</button>
+        <button class="btn-borrar" onclick="borrarDatos('total')">Borrar Todo</button>
     </div>
 
     <!-- PESTAÑA: BILLETES -->
     <div id="Billetes" class="tab-content">
-        <div class="card">
+        <div class="card" id="card-b200">
             <div class="card-info"><span class="den-title">S/ 200</span><span class="den-sub" id="sub-b200">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('b200', -1, 200)">-</button><input type="number" id="b200" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b200', 1, 200)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('b200', -1)">-</button><input type="number" id="b200" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b200', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-b100">
             <div class="card-info"><span class="den-title">S/ 100</span><span class="den-sub" id="sub-b100">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('b100', -1, 100)">-</button><input type="number" id="b100" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b100', 1, 100)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('b100', -1)">-</button><input type="number" id="b100" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b100', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-b50">
             <div class="card-info"><span class="den-title">S/ 50</span><span class="den-sub" id="sub-b50">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('b50', -1, 50)">-</button><input type="number" id="b50" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b50', 1, 50)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('b50', -1)">-</button><input type="number" id="b50" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b50', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-b20">
             <div class="card-info"><span class="den-title">S/ 20</span><span class="den-sub" id="sub-b20">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('b20', -1, 20)">-</button><input type="number" id="b20" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b20', 1, 20)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('b20', -1)">-</button><input type="number" id="b20" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b20', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-b10">
             <div class="card-info"><span class="den-title">S/ 10</span><span class="den-sub" id="sub-b10">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('b10', -1, 10)">-</button><input type="number" id="b10" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b10', 1, 10)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('b10', -1)">-</button><input type="number" id="b10" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('b10', 1)">+</button></div>
         </div>
 
-        <!-- Botón Borrar (Billetes) -->
-        <button class="btn-borrar" onclick="borrarDatos('billetes')">Borrar</button>
+        <button class="btn-borrar" onclick="borrarDatos('billetes')">Borrar Billetes</button>
     </div>
 
     <!-- PESTAÑA: MONEDAS -->
     <div id="Monedas" class="tab-content">
-        <div class="card">
+        <div class="card" id="card-m5">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-gold"></span>S/ 5.00</span><span class="den-sub" id="sub-m5">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m5', -1, 5)">-</button><input type="number" id="m5" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m5', 1, 5)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m5', -1)">-</button><input type="number" id="m5" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m5', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-m2">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-gold"></span>S/ 2.00</span><span class="den-sub" id="sub-m2">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m2', -1, 2)">-</button><input type="number" id="m2" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m2', 1, 2)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m2', -1)">-</button><input type="number" id="m2" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m2', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-m1">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-silver"></span>S/ 1.00</span><span class="den-sub" id="sub-m1">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m1', -1, 1)">-</button><input type="number" id="m1" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m1', 1, 1)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m1', -1)">-</button><input type="number" id="m1" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m1', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-m050">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-silver"></span>S/ 0.50</span><span class="den-sub" id="sub-m050">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m050', -1, 0.5)">-</button><input type="number" id="m050" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m050', 1, 0.5)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m050', -1)">-</button><input type="number" id="m050" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m050', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-m020">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-silver"></span>S/ 0.20</span><span class="den-sub" id="sub-m020">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m020', -1, 0.2)">-</button><input type="number" id="m020" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m020', 1, 0.2)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m020', -1)">-</button><input type="number" id="m020" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m020', 1)">+</button></div>
         </div>
-        <div class="card">
+        <div class="card" id="card-m010">
             <div class="card-info"><span class="den-title"><span class="coin-icon coin-silver"></span>S/ 0.10</span><span class="den-sub" id="sub-m010">S/ 0.00</span></div>
-            <div class="controls"><button class="btn-control" onclick="modificar('m010', -1, 0.1)">-</button><input type="number" id="m010" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m010', 1, 0.1)">+</button></div>
+            <div class="controls"><button class="btn-control" onclick="modificar('m010', -1)">-</button><input type="number" id="m010" class="input-qty" placeholder="0" oninput="calcularCuadre()"><button class="btn-control" onclick="modificar('m010', 1)">+</button></div>
         </div>
 
-        <!-- Botón Borrar (Monedas) -->
-        <button class="btn-borrar" onclick="borrarDatos('monedas')">Borrar</button>
+        <button class="btn-borrar" onclick="borrarDatos('monedas')">Borrar Monedas</button>
     </div>
 
     <script>
-        // ENDPOINT CONECTADO DE GOOGLE APPS SCRIPT
+        // URL CONECTADA DE APPS SCRIPT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHuCtvbvlcJYa9rpEveOI2irh57HyU0yo-DSamd-pXFIzhsfKR-lozjqwFFxkenGpV/exec";
 
-        // Función para cambiar de pestañas
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -396,81 +410,107 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // Función para botones de + y -
-        function modificar(id, cantidad, valorDenominacion) {
+        // Modificación flexible: permite valores negativos reales
+        function modificar(id, cantidad) {
             let input = document.getElementById(id);
             let valorActual = parseInt(input.value) || 0;
             let nuevoValor = valorActual + cantidad;
 
-            if (nuevoValor > 0) {
-                input.value = nuevoValor;
+            if (nuevoValor === 0) {
+                input.value = "";
             } else {
-                input.value = ""; // Vuelve a quedar en blanco si es 0
+                input.value = nuevoValor;
             }
             calcularCuadre();
         }
 
-        // FUNCIÓN DE BORRADO DINÁMICO E INMEDIATO (Sin confirmación)
         function borrarDatos(tipo) {
             let inputsALimpiar = [];
 
             if (tipo === 'total') {
                 inputsALimpiar = ['f1000', 'b200', 'b100', 'b50', 'b20', 'b10', 'm5', 'm2', 'm1', 'm050', 'm020', 'm010', 'input-sistema'];
-            } 
-            else if (tipo === 'billetes') {
+            } else if (tipo === 'billetes') {
                 inputsALimpiar = ['b200', 'b100', 'b50', 'b20', 'b10'];
-            } 
-            else if (tipo === 'monedas') {
+            } else if (tipo === 'monedas') {
                 inputsALimpiar = ['m5', 'm2', 'm1', 'm050', 'm020', 'm010'];
             }
 
-            // Vaciar los inputs seleccionados automáticamente
             for (let i = 0; i < inputsALimpiar.length; i++) {
                 document.getElementById(inputsALimpiar[i]).value = "";
             }
-            
-            // Recalcular para que todo vuelva a cero en la vista
             calcularCuadre();
         }
 
-        // Función para dar formato de moneda con separador de miles
         function formatoMoneda(valor) {
-            return "S/ " + valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            let absValor = Math.abs(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return valor < 0 ? "- S/ " + absValor : "S/ " + absValor;
+        }
+
+        // Actualiza el estado visual (Rojo si es negativo / Normal si es >= 0)
+        function actualizarEstadoVisual(id, subId, cardId, cantidad, subtotal) {
+            let inputElem = document.getElementById(id);
+            let subElem = document.getElementById(subId);
+            let cardElem = document.getElementById(cardId);
+
+            subElem.innerText = formatoMoneda(subtotal);
+
+            if (cantidad < 0) {
+                inputElem.classList.add('val-negativo');
+                subElem.classList.add('sub-negativo');
+                if (cardElem) cardElem.classList.add('card-negativa');
+            } else {
+                inputElem.classList.remove('val-negativo');
+                subElem.classList.remove('sub-negativo');
+                if (cardElem) cardElem.classList.remove('card-negativa');
+            }
         }
 
         // Motor de cálculo principal
         function calcularCuadre() {
             let getVal = (id) => parseInt(document.getElementById(id).value) || 0;
 
-            // Valores parciales
-            let v_f1000 = getVal('f1000') * 1000;
-            let v_b200 = getVal('b200') * 200;
-            let v_b100 = getVal('b100') * 100;
-            let v_b50 = getVal('b50') * 50;
-            let v_b20 = getVal('b20') * 20;
-            let v_b10 = getVal('b10') * 10;
-            let v_m5 = getVal('m5') * 5.0;
-            let v_m2 = getVal('m2') * 2.0;
-            let v_m1 = getVal('m1') * 1.0;
-            let v_m050 = getVal('m050') * 0.5;
-            let v_m020 = getVal('m020') * 0.2;
-            let v_m010 = getVal('m010') * 0.1;
+            let c_f1000 = getVal('f1000');
+            let c_b200 = getVal('b200');
+            let c_b100 = getVal('b100');
+            let c_b50 = getVal('b50');
+            let c_b20 = getVal('b20');
+            let c_b10 = getVal('b10');
+            let c_m5 = getVal('m5');
+            let c_m2 = getVal('m2');
+            let c_m1 = getVal('m1');
+            let c_m050 = getVal('m050');
+            let c_m020 = getVal('m020');
+            let c_m010 = getVal('m010');
 
-            // Actualizar subtítulos en las tarjetas con separador de miles
-            document.getElementById('sub-f1000').innerText = formatoMoneda(v_f1000);
-            document.getElementById('sub-b200').innerText = formatoMoneda(v_b200);
-            document.getElementById('sub-b100').innerText = formatoMoneda(v_b100);
-            document.getElementById('sub-b50').innerText = formatoMoneda(v_b50);
-            document.getElementById('sub-b20').innerText = formatoMoneda(v_b20);
-            document.getElementById('sub-b10').innerText = formatoMoneda(v_b10);
-            document.getElementById('sub-m5').innerText = formatoMoneda(v_m5);
-            document.getElementById('sub-m2').innerText = formatoMoneda(v_m2);
-            document.getElementById('sub-m1').innerText = formatoMoneda(v_m1);
-            document.getElementById('sub-m050').innerText = formatoMoneda(v_m050);
-            document.getElementById('sub-m020').innerText = formatoMoneda(v_m020);
-            document.getElementById('sub-m010').innerText = formatoMoneda(v_m010);
+            // Subtotales con signo
+            let v_f1000 = c_f1000 * 1000;
+            let v_b200 = c_b200 * 200;
+            let v_b100 = c_b100 * 100;
+            let v_b50 = c_b50 * 50;
+            let v_b20 = c_b20 * 20;
+            let v_b10 = c_b10 * 10;
+            let v_m5 = c_m5 * 5.0;
+            let v_m2 = c_m2 * 2.0;
+            let v_m1 = c_m1 * 1.0;
+            let v_m050 = c_m050 * 0.5;
+            let v_m020 = c_m020 * 0.2;
+            let v_m010 = c_m010 * 0.1;
 
-            // Cálculos totales
+            // Alertas visuales individuales
+            actualizarEstadoVisual('f1000', 'sub-f1000', 'card-f1000', c_f1000, v_f1000);
+            actualizarEstadoVisual('b200', 'sub-b200', 'card-b200', c_b200, v_b200);
+            actualizarEstadoVisual('b100', 'sub-b100', 'card-b100', c_b100, v_b100);
+            actualizarEstadoVisual('b50', 'sub-b50', 'card-b50', c_b50, v_b50);
+            actualizarEstadoVisual('b20', 'sub-b20', 'card-b20', c_b20, v_b20);
+            actualizarEstadoVisual('b10', 'sub-b10', 'card-b10', c_b10, v_b10);
+            actualizarEstadoVisual('m5', 'sub-m5', 'card-m5', c_m5, v_m5);
+            actualizarEstadoVisual('m2', 'sub-m2', 'card-m2', c_m2, v_m2);
+            actualizarEstadoVisual('m1', 'sub-m1', 'card-m1', c_m1, v_m1);
+            actualizarEstadoVisual('m050', 'sub-m050', 'card-m050', c_m050, v_m050);
+            actualizarEstadoVisual('m020', 'sub-m020', 'card-m020', c_m020, v_m020);
+            actualizarEstadoVisual('m010', 'sub-m010', 'card-m010', c_m010, v_m010);
+
+            // Totales de arqueo
             let totalEfectivo = v_f1000 + v_b200 + v_b100 + v_b50 + v_b20 + v_b10 + v_m5 + v_m2 + v_m1 + v_m050 + v_m020 + v_m010;
             let saldoSistema = parseFloat(document.getElementById('input-sistema').value) || 0;
             let capitalBase = parseFloat(document.getElementById('input-base').value) || 0;
@@ -478,7 +518,6 @@
             let sumaTotal = totalEfectivo + saldoSistema;
             let diferencia = sumaTotal - capitalBase;
 
-            // Actualizar vistas en la pestaña TOTAL con separador de miles
             document.getElementById('display-efectivo').innerText = formatoMoneda(totalEfectivo);
             document.getElementById('display-suma').innerText = formatoMoneda(sumaTotal);
 
@@ -496,7 +535,7 @@
             } else if (diferencia < 0) {
                 cajaDif.classList.add('estado-rojo');
                 msjEstado.innerText = "⚠️ FALTAN";
-                valorDif.innerText = "- " + formatoMoneda(Math.abs(diferencia));
+                valorDif.innerText = "- " + formatoMoneda(Math.abs(diferencia)).replace('- ', '');
             } else {
                 cajaDif.classList.add('estado-naranja');
                 msjEstado.innerText = "⚠️ SOBRAN";
@@ -504,7 +543,7 @@
             }
         }
 
-        // FUNCIÓN DE CONEXIÓN CON GOOGLE SHEETS
+        // Envío fidedigno de datos (incluyendo reducciones o retiros) a Google Sheets
         function sincronizarConSheets() {
             const btn = document.getElementById("btn-sync");
             btn.disabled = true;
@@ -580,7 +619,6 @@
             });
         }
 
-        // Inicializar cálculos al cargar
         window.onload = calcularCuadre;
     </script>
 </body>
