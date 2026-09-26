@@ -393,8 +393,8 @@
     </div>
 
     <script>
-        // URL CONECTADA DE APPS SCRIPT
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHuCtvbvlcJYa9rpEveOI2irh57HyU0yo-DSamd-pXFIzhsfKR-lozjqwFFxkenGpV/exec";
+        // URL ACTUALIZADA Y CONECTADA DE GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyk1XMXrpOBVc6hz_IqYtpRVeZrU-3qFkTymv76kJLfYf8MQaozYQv9bx9Cp1YEdL_a/exec";
 
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
@@ -410,7 +410,7 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // Modificación flexible: permite valores negativos reales
+        // Modificación flexible que permite valores negativos
         function modificar(id, cantidad) {
             let input = document.getElementById(id);
             let valorActual = parseInt(input.value) || 0;
@@ -446,7 +446,6 @@
             return valor < 0 ? "- S/ " + absValor : "S/ " + absValor;
         }
 
-        // Actualiza el estado visual (Rojo si es negativo / Normal si es >= 0)
         function actualizarEstadoVisual(id, subId, cardId, cantidad, subtotal) {
             let inputElem = document.getElementById(id);
             let subElem = document.getElementById(subId);
@@ -465,7 +464,6 @@
             }
         }
 
-        // Motor de cálculo principal
         function calcularCuadre() {
             let getVal = (id) => parseInt(document.getElementById(id).value) || 0;
 
@@ -482,7 +480,6 @@
             let c_m020 = getVal('m020');
             let c_m010 = getVal('m010');
 
-            // Subtotales con signo
             let v_f1000 = c_f1000 * 1000;
             let v_b200 = c_b200 * 200;
             let v_b100 = c_b100 * 100;
@@ -496,7 +493,6 @@
             let v_m020 = c_m020 * 0.2;
             let v_m010 = c_m010 * 0.1;
 
-            // Alertas visuales individuales
             actualizarEstadoVisual('f1000', 'sub-f1000', 'card-f1000', c_f1000, v_f1000);
             actualizarEstadoVisual('b200', 'sub-b200', 'card-b200', c_b200, v_b200);
             actualizarEstadoVisual('b100', 'sub-b100', 'card-b100', c_b100, v_b100);
@@ -510,7 +506,6 @@
             actualizarEstadoVisual('m020', 'sub-m020', 'card-m020', c_m020, v_m020);
             actualizarEstadoVisual('m010', 'sub-m010', 'card-m010', c_m010, v_m010);
 
-            // Totales de arqueo
             let totalEfectivo = v_f1000 + v_b200 + v_b100 + v_b50 + v_b20 + v_b10 + v_m5 + v_m2 + v_m1 + v_m050 + v_m020 + v_m010;
             let saldoSistema = parseFloat(document.getElementById('input-sistema').value) || 0;
             let capitalBase = parseFloat(document.getElementById('input-base').value) || 0;
@@ -521,7 +516,6 @@
             document.getElementById('display-efectivo').innerText = formatoMoneda(totalEfectivo);
             document.getElementById('display-suma').innerText = formatoMoneda(sumaTotal);
 
-            // Semáforo
             let cajaDif = document.getElementById('caja-diferencia');
             let msjEstado = document.getElementById('mensaje-estado');
             let valorDif = document.getElementById('valor-diferencia');
@@ -543,7 +537,7 @@
             }
         }
 
-        // Envío fidedigno de datos (incluyendo reducciones o retiros) a Google Sheets
+        // Envío acumulativo directo a Google Sheets
         function sincronizarConSheets() {
             const btn = document.getElementById("btn-sync");
             btn.disabled = true;
@@ -551,45 +545,21 @@
 
             let getVal = (id) => parseInt(document.getElementById(id).value) || 0;
 
-            let f1000 = getVal('f1000');
-            let b200 = getVal('b200');
-            let b100 = getVal('b100');
-            let b50 = getVal('b50');
-            let b20 = getVal('b20');
-            let b10 = getVal('b10');
-            let m5 = getVal('m5');
-            let m2 = getVal('m2');
-            let m1 = getVal('m1');
-            let m050 = getVal('m050');
-            let m020 = getVal('m020');
-            let m010 = getVal('m010');
-
-            let totalEfectivo = (f1000 * 1000) + (b200 * 200) + (b100 * 100) + (b50 * 50) + (b20 * 20) + (b10 * 10) +
-                                (m5 * 5) + (m2 * 2) + (m1 * 1) + (m050 * 0.5) + (m020 * 0.2) + (m010 * 0.1);
-
-            let saldoSistema = parseFloat(document.getElementById('input-sistema').value) || 0;
-            let capitalBase = parseFloat(document.getElementById('input-base').value) || 0;
-            let capitalTotal = totalEfectivo + saldoSistema;
-            let diferencia = capitalTotal - capitalBase;
-
             let paqueteDatos = {
-                f1000: f1000,
-                b200: b200,
-                b100: b100,
-                b50: b50,
-                b20: b20,
-                b10: b10,
-                m5: m5,
-                m2: m2,
-                m1: m1,
-                m050: m050,
-                m020: m020,
-                m010: m010,
-                totalEfectivo: totalEfectivo,
-                saldoSistema: saldoSistema,
-                capitalTotal: capitalTotal,
-                capitalBase: capitalBase,
-                diferencia: diferencia
+                f1000: getVal('f1000'),
+                b200: getVal('b200'),
+                b100: getVal('b100'),
+                b50: getVal('b50'),
+                b20: getVal('b20'),
+                b10: getVal('b10'),
+                m5: getVal('m5'),
+                m2: getVal('m2'),
+                m1: getVal('m1'),
+                m050: getVal('m050'),
+                m020: getVal('m020'),
+                m010: getVal('m010'),
+                saldoSistema: document.getElementById('input-sistema').value,
+                capitalBase: document.getElementById('input-base').value
             };
 
             fetch(SCRIPT_URL, {
