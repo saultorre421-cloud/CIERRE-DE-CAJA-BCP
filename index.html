@@ -13,6 +13,7 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --card-bg: #ffffff;
+            --success-color: #16a34a;
         }
 
         body { 
@@ -218,18 +219,37 @@
         .coin-gold { background: radial-gradient(circle, #fde047, #ca8a04); }
         .coin-silver { background: radial-gradient(circle, #f1f5f9, #94a3b8); }
 
-        /* BOTÓN BORRAR INFERIOR (Discreto y Profesional) */
+        /* BOTÓN SINCRONIZAR A GOOGLE SHEETS */
+        .btn-sync {
+            display: block;
+            width: 100%;
+            margin: 18px 0 10px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: var(--bcp-orange);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(255, 121, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-sync:active { transform: scale(0.98); opacity: 0.92; }
+        .btn-sync:disabled { background-color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+
+        /* BOTÓN BORRAR INFERIOR */
         .btn-borrar {
             display: block;
-            margin: 20px auto 0;
+            margin: 15px auto 0;
             padding: 8px 24px;
             font-size: 14px;
             font-weight: 700;
-            border-radius: 20px; /* Diseño en forma de píldora */
+            border-radius: 20px;
             cursor: pointer;
             border: 1px solid #e2e8f0;
             background-color: #f8fafc;
-            color: #ef4444; /* Color rojo sutil para indicar borrado */
+            color: #ef4444;
             transition: 0.2s ease;
         }
         .btn-borrar:active {
@@ -237,7 +257,6 @@
             border-color: #fca5a5;
             transform: scale(0.95);
         }
-
     </style>
 </head>
 <body>
@@ -290,6 +309,11 @@
                 <button class="btn-control" onclick="modificar('f1000', 1, 1000)">+</button>
             </div>
         </div>
+
+        <!-- BOTÓN DE CONEXIÓN CON GOOGLE SHEETS -->
+        <button class="btn-sync" id="btn-sync" onclick="sincronizarConSheets()">
+            📤 Sincronizar con Hoja de Cálculo
+        </button>
 
         <!-- Botón Borrar (Total) -->
         <button class="btn-borrar" onclick="borrarDatos('total')">Borrar</button>
@@ -354,6 +378,9 @@
     </div>
 
     <script>
+        // ENDPOINT CONECTADO DE GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHuCtvbvlcJYa9rpEveOI2irh57HyU0yo-DSamd-pXFIzhsfKR-lozjqwFFxkenGpV/exec";
+
         // Función para cambiar de pestañas
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
@@ -475,6 +502,82 @@
                 msjEstado.innerText = "⚠️ SOBRAN";
                 valorDif.innerText = "+ " + formatoMoneda(diferencia);
             }
+        }
+
+        // FUNCIÓN DE CONEXIÓN CON GOOGLE SHEETS
+        function sincronizarConSheets() {
+            const btn = document.getElementById("btn-sync");
+            btn.disabled = true;
+            btn.innerText = "⏳ Sincronizando datos...";
+
+            let getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+
+            let f1000 = getVal('f1000');
+            let b200 = getVal('b200');
+            let b100 = getVal('b100');
+            let b50 = getVal('b50');
+            let b20 = getVal('b20');
+            let b10 = getVal('b10');
+            let m5 = getVal('m5');
+            let m2 = getVal('m2');
+            let m1 = getVal('m1');
+            let m050 = getVal('m050');
+            let m020 = getVal('m020');
+            let m010 = getVal('m010');
+
+            let totalEfectivo = (f1000 * 1000) + (b200 * 200) + (b100 * 100) + (b50 * 50) + (b20 * 20) + (b10 * 10) +
+                                (m5 * 5) + (m2 * 2) + (m1 * 1) + (m050 * 0.5) + (m020 * 0.2) + (m010 * 0.1);
+
+            let saldoSistema = parseFloat(document.getElementById('input-sistema').value) || 0;
+            let capitalBase = parseFloat(document.getElementById('input-base').value) || 0;
+            let capitalTotal = totalEfectivo + saldoSistema;
+            let diferencia = capitalTotal - capitalBase;
+
+            let paqueteDatos = {
+                f1000: f1000,
+                b200: b200,
+                b100: b100,
+                b50: b50,
+                b20: b20,
+                b10: b10,
+                m5: m5,
+                m2: m2,
+                m1: m1,
+                m050: m050,
+                m020: m020,
+                m010: m010,
+                totalEfectivo: totalEfectivo,
+                saldoSistema: saldoSistema,
+                capitalTotal: capitalTotal,
+                capitalBase: capitalBase,
+                diferencia: diferencia
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(paqueteDatos)
+            })
+            .then(() => {
+                btn.style.backgroundColor = "var(--success-color)";
+                btn.innerText = "✅ ¡Sincronizado en Hoja!";
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.backgroundColor = "var(--bcp-orange)";
+                    btn.innerText = "📤 Sincronizar con Hoja de Cálculo";
+                }, 2200);
+            })
+            .catch((err) => {
+                console.error("Error al sincronizar:", err);
+                btn.style.backgroundColor = "#dc2626";
+                btn.innerText = "❌ Error al sincronizar";
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.backgroundColor = "var(--bcp-orange)";
+                    btn.innerText = "📤 Sincronizar con Hoja de Cálculo";
+                }, 3000);
+            });
         }
 
         // Inicializar cálculos al cargar
